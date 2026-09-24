@@ -42,3 +42,6 @@ Deployment: badfc45174624e90a134b3411722b70c
 Date: 2026-09-24
 
 See design/verification.md for checks and limitations.
+
+## September 24 fidelity revision
+The live Lassie reference now determines typography, section geometry, compact navigation and pinned scrolling stages. See `design-qa.md` for reference evidence, verification, intentional Seehafer content substitutions and remaining fidelity limits. The earlier generated concept images are superseded by this revision.
