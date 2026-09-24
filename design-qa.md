@@ -21,3 +21,14 @@ Reference: https://www.lassie.ai/ . Concept.png remains the Seehafer content bri
 
 Deployment: https://seehaferwartungtest.ksqsebastian.workers.dev/
 Cloudflare deployment ID: 4342ed9b066445ea8e2d56d9799bb492
+
+## Hamburg trust correction
+
+- User selected Hamburg outline. Replaced photograph backdrop with a dot map projected from the Hamburg boundary. Source and attribution recorded in README.
+- Corrected desktop card width (44.3vw), landscape composition, 24px padding/gap, 16px image corners, 766:505 aspect ratio and scroll-driven entrance/scaling.
+- Corrected mobile to the source's 296px cards at 390px viewport and a horizontal snap carousel. Swipe verified (scrollLeft changed to 344 in the initial revision); document remained 390px wide.
+- Centered mobile navigation and removed the separate mobile contact pill to match the source. Corrected serif wordmark and 50px mobile hero heading.
+- Verified local desktop/mobile and Cloudflare rendering. No console errors during checked flows. Build and JS syntax passed.
+- Evidence: design/trust-desktop.png, design/trust-mobile.png, design/trust-live.png, design/reference/trust-mobile.png. Screenshots reflect different points in the scroll sequence; no pixel-perfect comparison is claimed.
+- Cloudflare deployment: a43dc28684c045398f409d2d9e92d8fc.
+- Remaining fidelity limit: original clinical assets and customer-density markers are not Seehafer evidence; Seehafer imagery and a Hamburg city marker are used. Animation curves are recreated, not verified frame for frame. Full-site perfect-copy acceptance remains unverified.

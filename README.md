@@ -45,3 +45,5 @@ See design/verification.md for checks and limitations.
 
 ## September 24 fidelity revision
 The live Lassie reference now determines typography, section geometry, compact navigation and pinned scrolling stages. See `design-qa.md` for reference evidence, verification, intentional Seehafer content substitutions and remaining fidelity limits. The earlier generated concept images are superseded by this revision.
+
+The Hamburg dot map is projected from the Hamburg boundary in isellsoap/deutschlandGeoJSON (2_bundeslaender/4_niedrig.geo.json), published under the Unlicense, with source data credited there to GIS-DATA. The city marker identifies Hamburg, not a customer location or customer count. https://github.com/isellsoap/deutschlandGeoJSON
