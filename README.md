@@ -47,3 +47,20 @@ See design/verification.md for checks and limitations.
 The live Lassie reference now determines typography, section geometry, compact navigation and pinned scrolling stages. See `design-qa.md` for reference evidence, verification, intentional Seehafer content substitutions and remaining fidelity limits. The earlier generated concept images are superseded by this revision.
 
 The Hamburg dot map is projected from the Hamburg boundary in isellsoap/deutschlandGeoJSON (2_bundeslaender/4_niedrig.geo.json), published under the Unlicense, with source data credited there to GIS-DATA. The city marker identifies Hamburg, not a customer location or customer count. https://github.com/isellsoap/deutschlandGeoJSON
+
+## Reusable company template — September 28
+
+The approved white-background baseline is preserved at Git tag **seehaferwartungbase** (`d98a04a`). Restore into a separate checkout with `git worktree add ../seehaferwartungbase seehaferwartungbase`; do not reset the current checkout to preview it.
+
+The current edition keeps the approved narrative: outcome → proof → relief → speed. Reference projects live on the page, with keyboard-accessible tabs, previous/next controls, and native detail dialogs. Published project facts and original photos were refreshed from https://seehafer-elemente.de/referenzen on 2026-09-28; retrofit projects are labeled separately from the maintenance contract.
+
+- `public/projects.js`: project names, image paths, descriptions, verified figures, and colors.
+- `public/experience.css`: reference component, motion tokens, responsive rules, reduced-motion and print styles.
+- `public/experience.js`: project selection, detail dialog, pointer response, scroll progress and in-view motion.
+- `public/style.css`: base typography, layout and brand tokens (`--ink`, `--blue`, `--lime`, `--sky`, `--lavender`).
+
+For another company, replace project data and contact information, then update brand tokens. Keep the narrative structure and verify every published figure against that company's own sources. The Hamburg video and map belong to this company-specific edition.
+
+Motion research: Mobbin's public Micro-interactions collection (Luma success feedback and Doji progressive selection) was inspected through the browser after connector search failed. Public previews were accessible; full flow playback was not available without account access. Inspired patterns are implemented independently, without copying screenshot assets. https://mobbin.com/screens/c9d14f68-316b-408e-b90b-67f54c7918cb
+
+The inquiry still prepares an email in the visitor's own email application. Direct server delivery requires a verified sender domain; the connected Resend account had no domains on 2026-09-28. Do not present a prepared email as sent. No CRM automation is implied.
