@@ -6,7 +6,7 @@ German maintenance landing page based on the supplied Concept.png and the live L
 
 ## Run
 
-`npm ci` then `npm run dev` — http://localhost:4318
+`npm ci` then `npm run dev` — http://localhost:4318 (Worker and static assets). Use `npm run dev:static` for the visual-only preview.
 
 `npm run build` verifies the asset inventory and creates the Cloudflare upload manifest. `npm run deploy` uses an authenticated Wrangler installation. This deployment was published through the connected Cloudflare API with Workers static assets.
 
@@ -15,7 +15,7 @@ German maintenance landing page based on the supplied Concept.png and the live L
 - Floating responsive navigation and mobile menu.
 - Full-screen muted Hamburg video, pause control, reduced-motion support.
 - Rotating status text, parallax, sticky service panels and intersection reveals.
-- Email-first inquiry dialog prepares a message in the visitor's email app to Tobias Blöhse. The visitor must send it there; no backend email delivery or CRM integration is claimed.
+- Inquiry dialog sends directly through a Cloudflare Worker and Resend to a fixed server-configured recipient. Only a successful provider response shows the confirmation.
 - Native accessible FAQ accordions, sample maintenance protocol, print/PDF action and privacy dialog.
 
 ## Source boundaries
@@ -63,4 +63,15 @@ For another company, replace project data and contact information, then update b
 
 Motion research: Mobbin's public Micro-interactions collection (Luma success feedback and Doji progressive selection) was inspected through the browser after connector search failed. Public previews were accessible; full flow playback was not available without account access. Inspired patterns are implemented independently, without copying screenshot assets. https://mobbin.com/screens/c9d14f68-316b-408e-b90b-67f54c7918cb
 
-The inquiry still prepares an email in the visitor's own email application. Direct server delivery requires a verified sender domain; the connected Resend account had no domains on 2026-09-28. Do not present a prepared email as sent. No CRM automation is implied.
+The inquiry now sends directly through Resend. No CRM automation is implied.
+
+
+## Direct inquiry delivery
+
+`POST /api/inquiry` validates the request, applies a five-per-minute per-IP Cloudflare rate limit, and sends a plain-text email with the visitor as Reply-To. Sender: `Seehafer Wartung <onboarding@resend.dev>`. The recipient is a fixed server secret; the browser cannot select recipients. The Resend test sender only delivers to the account owner, using the exact registered address. For another company/inbox, configure a verified sender domain first.
+
+Configure `RESEND_API_KEY` (sending-only) and `INQUIRY_TO` with `wrangler secret put`. Never put either value in public files or Git. Local Worker development reads them from an ignored `.dev.vars` file. `wrangler.jsonc` contains the API route, ASSETS binding and rate-limit binding.
+
+The frontend retains an idempotency key across retries of unchanged content and preserves form fields after errors. It clears the form only after a confirmed provider response. No automatic confirmation email is sent to the visitor. Request contents are not written to application logs or a site database; Resend and the recipient mailbox process/store the email.
+
+`npm test` exercises validation, fixed recipients, origin checks, request limits, rate limits, provider failures and idempotent retries. Live end-to-end test on 2026-09-28: browser submission → success state → provider status **delivered**. The test was visibly labeled as a test, not a service order.

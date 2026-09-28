@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { handleInquiry } from '../src/worker.js';
+const payload={address:'Testobjekt 1, Hamburg',email:'visitor@example.com',caretaker:'',website:'',requestId:'77f082cb-3b56-47f2-a1c4-3833d5649b10'};
+const env={RESEND_API_KEY:'test-key',INQUIRY_TO:'owner@example.com',INQUIRY_LIMITER:{limit:async()=>({success:true})}};
+const request=(data=payload,headers={})=>new Request('https://site.example/api/inquiry',{method:'POST',headers:{Origin:'https://site.example','Content-Type':'application/json',...headers},body:JSON.stringify(data)});
+const noSend=()=>{throw new Error('Provider must not be called');};
+test('valid inquiry has fixed recipient and visitor reply-to',async()=>{let sent;const res=await handleInquiry(request({...payload,to:'attacker@example.com'}),env,async(url,init)=>{assert.equal(url,'https://api.resend.com/emails');sent=JSON.parse(init.body);assert.equal(init.headers['Idempotency-Key'],'seehafer-inquiry/'+payload.requestId);return Response.json({id:'provider-id'});});assert.equal(res.status,200);assert.deepEqual(sent.to,['owner@example.com']);assert.equal(sent.reply_to,payload.email);assert.equal((await res.json()).emailId,'provider-id');});
+test('cross-origin submissions are rejected',async()=>assert.equal((await handleInquiry(request(payload,{Origin:'https://other.example'}),env,noSend)).status,403));
+test('missing origin is rejected',async()=>{const req=request();req.headers.delete('Origin');assert.equal((await handleInquiry(req,env,noSend)).status,403);});
+test('invalid email and header injection are rejected',async()=>{for(const email of ['bad','x@example.com\r\nBcc:someone@example.com'])assert.equal((await handleInquiry(request({...payload,email}),env,noSend)).status,400);});
+test('oversized fields and bodies are rejected',async()=>{for(const address of ['x'.repeat(251),'x'.repeat(5000)])assert.equal((await handleInquiry(request({...payload,address}),env,noSend)).status,400);});
+test('honeypot rejects bot submission',async()=>assert.equal((await handleInquiry(request({...payload,website:'spam'}),env,noSend)).status,400));
+test('GET is rejected',async()=>assert.equal((await handleInquiry(new Request('https://site.example/api/inquiry'),env,noSend)).status,405));
+test('rate limit prevents provider invocation',async()=>assert.equal((await handleInquiry(request(),{...env,INQUIRY_LIMITER:{limit:async()=>({success:false})}},noSend)).status,429));
+test('unconfigured delivery is not reported as sent',async()=>assert.equal((await handleInquiry(request(),{...env,RESEND_API_KEY:''},noSend)).status,503));
+test('provider error and network failure are not reported as sent',async()=>{assert.equal((await handleInquiry(request(),env,async()=>Response.json({message:'secret provider detail'},{status:403}))).status,502);const res=await handleInquiry(request(),env,async()=>{throw new Error('network');});assert.equal(res.status,502);assert.ok(!(await res.text()).includes('test-key'));});
+test('retry uses same provider idempotency key',async()=>{const keys=[];const send=async(_,init)=>{keys.push(init.headers['Idempotency-Key']);return Response.json({id:'same'});};await handleInquiry(request(),env,send);await handleInquiry(request(),env,send);assert.equal(keys[0],keys[1]);});

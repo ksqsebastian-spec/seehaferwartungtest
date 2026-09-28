@@ -1,1 +1,23 @@
-{"name":"seehaferwartungtest","compatibility_date":"2026-09-24","assets":{"directory":"./public"},"workers_dev":true}
+{
+  "name": "seehaferwartungtest",
+  "compatibility_date": "2026-09-24",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+  "workers_dev": true,
+  "main": "src/worker.js",
+  "ratelimits": [
+    {
+      "name": "INQUIRY_LIMITER",
+      "namespace_id": "9282601",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ]
+}
