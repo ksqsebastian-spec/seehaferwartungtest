@@ -29,4 +29,4 @@ $('#inquiry-form').addEventListener('submit',async e=>{
   finally{button.disabled=false;button.removeAttribute('aria-busy');button.querySelector('.submit-label').textContent='Anfrage senden';}
 });
 $('#sent-close').addEventListener('click',()=>inquiry.close());
-for(const id of ['sample-open','sample-footer'])$('#'+id).addEventListener('click',()=>$('#sample').showModal());$('#print-sample').addEventListener('click',()=>window.print());$('#privacy-open').addEventListener('click',()=>$('#privacy').showModal());
+$('#privacy-open').addEventListener('click',()=>$('#privacy').showModal());
