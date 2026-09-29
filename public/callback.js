@@ -9,7 +9,19 @@ function options(container, name, values) {
     text.textContent = item.label; label.append(input, text); return label;
   }));
 }
-function updateTimes() { const chosen = schedule.find(day => day.value === days.value); options(times, 'time', chosen?.windows || []); days.setCustomValidity(chosen ? '' : 'Bitte wählen Sie einen kommenden Werktag innerhalb von 60 Tagen.'); document.querySelector('#callback-error').textContent = chosen ? '' : 'Für diesen Tag gibt es keine Rückrufzeiten. Bitte wählen Sie einen Werktag.'; }
+let period = '';
+const groups = [{id:'morning',label:'Vormittags',from:9,to:12},{id:'noon',label:'Mittags',from:12,to:14},{id:'afternoon',label:'Nachmittags',from:14,to:17}];
+function updateTimes() {
+ const chosen=schedule.find(day=>day.value===days.value), windows=chosen?.windows||[], previous=form.querySelector('[name=time]:checked')?.value;
+ const available=groups.filter(g=>windows.some(w=>+w.value.slice(0,2)>=g.from&&+w.value.slice(0,2)<g.to));
+ if(!available.some(g=>g.id===period))period=available[0]?.id||'';
+ const periods=document.querySelector('#callback-periods');periods.replaceChildren(...available.map(g=>{const button=document.createElement('button');button.type='button';button.textContent=g.label;button.setAttribute('aria-pressed',g.id===period);button.onclick=()=>{period=g.id;updateTimes();};return button;}));
+ const group=available.find(g=>g.id===period), filtered=windows.filter(w=>group&&+w.value.slice(0,2)>=group.from&&+w.value.slice(0,2)<group.to);options(times,'time',filtered);
+ if(filtered.some(w=>w.value===previous))times.querySelectorAll('input').forEach(i=>i.checked=i.value===previous);
+ const selected=times.querySelector('input:checked');document.querySelector('#callback-suggestion').textContent=selected?'Vorschlag: '+filtered.find(w=>w.value===selected.value).label:'';
+ days.setCustomValidity(chosen?'':'Bitte wählen Sie einen kommenden Werktag innerhalb von 60 Tagen.');document.querySelector('#callback-error').textContent=chosen?'':'Für diesen Tag gibt es keine Rückrufzeiten. Bitte wählen Sie einen Werktag.';
+}
+times.addEventListener('change',()=>{document.querySelector('#callback-suggestion').textContent='Gewählt: '+times.querySelector('input:checked').nextElementSibling.textContent;});
 function refresh() { schedule = callbackSlots(); days.min = schedule[0].value; days.max = schedule.at(-1).value; if(!schedule.some(day => day.value === days.value)) days.value = schedule[0].value; updateTimes(); }
 days.addEventListener('change', updateTimes);
 document.querySelectorAll('[data-callback]').forEach(button => button.addEventListener('click', () => {
