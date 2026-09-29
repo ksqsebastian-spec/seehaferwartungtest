@@ -16,3 +16,14 @@ test('rate limit prevents provider invocation',async()=>assert.equal((await hand
 test('unconfigured delivery is not reported as sent',async()=>assert.equal((await handleInquiry(request(),{...env,RESEND_API_KEY:''},noSend)).status,503));
 test('provider error and network failure are not reported as sent',async()=>{assert.equal((await handleInquiry(request(),env,async()=>Response.json({message:'secret provider detail'},{status:403}))).status,502);const res=await handleInquiry(request(),env,async()=>{throw new Error('network');});assert.equal(res.status,502);assert.ok(!(await res.text()).includes('test-key'));});
 test('retry uses same provider idempotency key',async()=>{const keys=[];const send=async(_,init)=>{keys.push(init.headers['Idempotency-Key']);return Response.json({id:'same'});};await handleInquiry(request(),env,send);await handleInquiry(request(),env,send);assert.equal(keys[0],keys[1]);});
+
+import { callbackSlots } from '../public/callback-slots.js';
+test('callback slots skip weekends, use Berlin time and exclude started windows',()=>{
+  const slots=callbackSlots(new Date('2026-10-02T14:30:00Z'));
+  assert.equal(slots[0].value,'2026-10-05');
+  assert.equal(slots.length,5);
+  assert.deepEqual(callbackSlots(new Date('2026-09-29T08:30:00Z'))[0].windows.map(w=>w.value),['11:00','13:00','15:00']);
+});
+const callback=()=>({kind:'callback',name:'TEST Rückruf',phone:'+49 40 1234567',day:callbackSlots()[0].value,time:callbackSlots()[0].windows[0].value,requestId:payload.requestId});
+test('callback delivers name, phone and requested Berlin window to fixed inbox',async()=>{let sent;const res=await handleInquiry(request(callback()),env,async(_,init)=>{sent=JSON.parse(init.body);return Response.json({id:'callback-id'});});assert.equal(res.status,200);assert.deepEqual(sent.to,['owner@example.com']);assert.ok(sent.text.includes('+49 40 1234567'));assert.ok(sent.text.includes('Europe/Berlin'));assert.ok(sent.subject.startsWith('Rückrufwunsch'));assert.equal(sent.reply_to,undefined);});
+test('callback rejects stale dates, weekends, arbitrary times and invalid phone',async()=>{for(const bad of [{day:'2000-01-01'},{time:'03:00'},{phone:'hello'},{name:''},{phone:'123456\r\nBcc: x'}])assert.equal((await handleInquiry(request({...callback(),...bad}),env,noSend)).status,400);});
