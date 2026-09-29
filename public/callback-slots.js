@@ -3,7 +3,7 @@ export function callbackSlots(now = new Date()) {
   const local = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now);
   const part = key => local.find(p => p.type === key).value;
   const today = `${part('year')}-${part('month')}-${part('day')}`;
-  const minutes = Number(part('hour')) * 60 + Number(part('minute')); 
+  const minutes = Number(part('hour')) * 60 + Number(part('minute'));
   const start = new Date(today + 'T12:00:00Z');
   const days = [];
   for (let offset = 0; offset <= 60; offset++) {
