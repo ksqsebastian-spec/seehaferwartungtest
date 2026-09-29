@@ -1,3 +1,4 @@
+import { handleIntake } from './intake.js';
 import { callbackSlots } from '../public/callback-slots.js';
 const response = (status, data, extra = {}) => new Response(JSON.stringify(data), {
   status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', ...extra },
@@ -65,6 +66,7 @@ export async function handleInquiry(request, env, send = fetch) {
 export default {
   async fetch(request, env) {
     const path = new URL(request.url).pathname;
+    if (path === '/api/intake' || path === '/api/intake/verify') return handleIntake(request, env);
     if (path === '/api/inquiry') return handleInquiry(request, env);
     if (path.startsWith('/api/')) return response(404, { error: 'Nicht gefunden.' });
     return env.ASSETS.fetch(request);

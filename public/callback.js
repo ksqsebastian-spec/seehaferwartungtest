@@ -59,3 +59,9 @@ form.addEventListener('submit', async event => {
     document.querySelector('#callback-error').textContent = ['TimeoutError', 'TypeError'].includes(error.name) ? 'Die Verbindung wurde unterbrochen. Ihre Angaben bleiben erhalten. Bitte versuchen Sie es erneut.' : error.message;
   } finally { button.disabled = false; button.removeAttribute('aria-busy'); button.innerHTML = 'Rückruf anfragen <span aria-hidden="true">↗</span>'; }
 });
+
+// Direct entry from the acknowledgement email; retain the normal website modal.
+if(new URLSearchParams(location.search).get('rueckruf')==='1'){
+ const url=new URL(location.href);url.searchParams.delete('rueckruf');history.replaceState(null,'',url.pathname+url.search);
+ document.querySelector('[data-callback]')?.click();
+}
