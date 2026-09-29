@@ -2,6 +2,15 @@ import { callbackSlots } from './callback-slots.js?v=calendar2';
 const dialog = document.querySelector('#callback'), form = document.querySelector('#callback-form');
 const days = document.querySelector('#callback-date'), times = document.querySelector('#callback-times');
 let schedule = [], pending;
+function updateTiming() {
+ const asap=form.querySelector('[name=timing]:checked').value==='asap';
+ form.querySelectorAll('[data-scheduled]').forEach(el=>{el.hidden=asap;if(el.tagName==='FIELDSET')el.disabled=asap;});
+ document.querySelector('#callback-asap-note').hidden=!asap;
+ document.querySelector('#callback-error').textContent='';
+}
+form.querySelectorAll('[name=timing]').forEach(input=>input.addEventListener('change',updateTiming));
+updateTiming();
+
 function options(container, name, values) {
   container.replaceChildren(...values.map((item, i) => {
     const label = document.createElement('label'), input = document.createElement('input'), text = document.createElement('span');
@@ -26,13 +35,13 @@ function refresh() { schedule = callbackSlots(); days.min = schedule[0].value; d
 days.addEventListener('change', updateTimes);
 document.querySelectorAll('[data-callback]').forEach(button => button.addEventListener('click', () => {
   document.querySelector('#callback-content').hidden = false; document.querySelector('#callback-success').hidden = true;
-  document.querySelector('#callback-error').textContent = ''; refresh(); dialog.showModal();
+  document.querySelector('#callback-error').textContent = ''; refresh(); updateTiming(); dialog.showModal();
 }));
 document.querySelector('#callback-done').addEventListener('click', () => dialog.close());
 form.addEventListener('submit', async event => {
   event.preventDefault(); const button = form.querySelector('button[type=submit]'); if (button.disabled) return;
   const fields = Object.fromEntries(new FormData(form));
-  if (!callbackSlots().find(day => day.value === fields.day)?.windows.some(window => window.value === fields.time)) {
+  if (fields.timing !== 'asap' && !callbackSlots().find(day => day.value === fields.day)?.windows.some(window => window.value === fields.time)) {
     refresh(); document.querySelector('#callback-error').textContent = 'Das Zeitfenster ist inzwischen vergangen. Bitte wählen Sie erneut.'; return;
   }
   const fingerprint = JSON.stringify(fields);
@@ -42,7 +51,8 @@ form.addEventListener('submit', async event => {
     const response = await fetch('/api/inquiry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...fields, kind: 'callback', requestId: pending.requestId }), signal: AbortSignal.timeout(18000) });
     const result = await response.json(); if (!response.ok || !result.ok) throw new Error(result.error || 'Bitte versuchen Sie es erneut.');
     const selected = schedule.find(day => day.value === fields.day);
-    document.querySelector('#callback-summary').textContent = `${selected.label}, ${selected.windows.find(window => window.value === fields.time).label} · ${fields.phone}`;
+    document.querySelector('#callback-summary').textContent = fields.timing === 'asap' ? `So schnell wie möglich · ${fields.phone}` : `${selected.label}, ${selected.windows.find(window => window.value === fields.time).label} · ${fields.phone}`;
+    document.querySelector('#callback-summary').nextElementSibling.textContent = fields.timing === 'asap' ? 'Wir haben Ihren Rückrufwunsch erhalten und melden uns so schnell wie möglich während unserer Rückrufzeiten.' : 'Wir haben Ihren Wunsch erhalten. Der Termin ist noch nicht bestätigt.';
     document.querySelector('#callback-content').hidden = true; document.querySelector('#callback-success').hidden = false;
     document.querySelector('#callback-done').focus(); form.reset(); pending = null;
   } catch (error) {

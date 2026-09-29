@@ -22,11 +22,12 @@ export async function handleInquiry(request, env, send = fetch) {
   if (!data || typeof data !== 'object' || Array.isArray(data)) return response(400, { error: 'Ungültige Anfrage.' });
   if (data.website) return response(400, { error: 'Bitte prüfen Sie Ihre Eingaben.' });
   const callback = data.kind === 'callback';
+  const asap = callback && data.timing === 'asap';
   const validId = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(data.requestId ?? '');
   if (!validId || (data.kind && !['callback', 'inquiry'].includes(data.kind))) return response(400, { error: 'Ungültige Anfrage.' });
   if (callback) {
     const slot = callbackSlots().find(day => day.value === data.day)?.windows.find(window => window.value === data.time);
-    if (!textField(data.name, 100) || !data.name.trim() || !textField(data.phone, 40) || !/^[+0-9 ()/.-]{6,40}$/.test(data.phone) || data.phone.replace(/\D/g, '').length < 6 || !slot) return response(400, { error: 'Bitte prüfen Sie Name, Telefonnummer und Wunschzeit. Vergangene Zeitfenster können nicht angefragt werden.' });
+    if (!textField(data.name, 100) || !data.name.trim() || !textField(data.phone, 40) || !/^[+0-9 ()/.-]{6,40}$/.test(data.phone) || data.phone.replace(/\D/g, '').length < 6 || (!asap && !slot) || (data.timing !== undefined && !['asap', 'scheduled'].includes(data.timing))) return response(400, { error: 'Bitte prüfen Sie Name, Telefonnummer und Wunschzeit. Vergangene Zeitfenster können nicht angefragt werden.' });
   } else if (!textField(data.address, 250) || data.address.trim().length < 5 || !validEmail(data.email) || !textField(data.caretaker ?? '', 250)) {
     return response(400, { error: 'Bitte prüfen Sie die Objektadresse und Ihre E-Mail-Adresse.' });
   }
@@ -43,9 +44,10 @@ export async function handleInquiry(request, env, send = fetch) {
   };
   if (callback) {
     delete message.reply_to;
-    message.subject = 'Rückrufwunsch · ' + data.name.trim();
+    message.subject = (asap ? 'Sofortiger Rückrufwunsch · ' : 'Rückrufwunsch · ') + data.name.trim();
     const slot = callbackSlots().find(day => day.value === data.day)?.windows.find(window => window.value === data.time);
     message.text = `Rückrufwunsch über die Seehafer-Website\n\nName: ${data.name.trim()}\nTelefon: ${data.phone.trim()}\nWunschtag: ${data.day}\nZeitfenster: ${slot?.label || data.time} (Europe/Berlin)\n\nWunschzeit, noch kein bestätigter Termin. Bitte die Person im gewünschten Zeitfenster zurückrufen oder eine Alternative abstimmen.\n\nAnfragenummer: ${data.requestId}`;
+    if (asap) message.text = `Sofortiger Rückrufwunsch über die Seehafer-Website\n\nName: ${data.name.trim()}\nTelefon: ${data.phone.trim()}\n\nBitte so schnell wie möglich während der Rückrufzeiten (Mo–Fr, 9–17 Uhr, Europe/Berlin) zurückrufen.\n\nAnfragenummer: ${data.requestId}`;
   }
   try {
     const upstream = await send('https://api.resend.com/emails', {
