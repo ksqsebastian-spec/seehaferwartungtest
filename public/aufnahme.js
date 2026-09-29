@@ -55,10 +55,12 @@ form.addEventListener('submit',async e=>{
  const fingerprint=JSON.stringify({data,attachments});if(!pending||pending.fingerprint!==fingerprint)pending={fingerprint,requestId:crypto.randomUUID()};$('#submit').disabled=true;$('#submit').textContent='Wird gesendet …';$('#error').textContent='';
  try{const response=await fetch('/api/intake',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,data,attachments,consent:true,website:new FormData(form).get('website'),requestId:pending.requestId}),signal:AbortSignal.timeout(20000)});const result=await response.json();if(!response.ok||!result.ok)throw new Error(result.error||'Bitte versuchen Sie es erneut.');submitted=true;form.hidden=true;$('#success').hidden=false;$('#receipt').textContent='Vorgang: '+result.reference;$('#success').focus();}
  catch(error){$('#error').textContent=error.name==='TimeoutError'||error.name==='TypeError'?'Der Versand konnte nicht bestätigt werden. Ihre Angaben bleiben erhalten. Bitte versuchen Sie es erneut.':error.message;}
- finally{$('#submit').disabled=false;$('#submit').textContent='Angaben senden ↗';}
+ finally{$('#submit').disabled=false;decorateButton($('#submit'),preview?'Vorschau prüfen':'Angaben senden');}
 });
 let furthest=0;const stepNames=['Objekt','Kontakt','Anlagen','Zugang','Angebot','Rückmeldung','Prüfen'];const stepNav=node('nav',null,'step-nav');stepNav.setAttribute('aria-label','Abschnitte der Objektaufnahme');stepNames.forEach((label,i)=>{const b=node('button',null,'step-link');b.type='button';b.append(node('span',String(i+1).padStart(2,'0'),'step-dot'),node('span',label));b.onclick=()=>go(i);stepNav.append(b);});document.querySelector('main').before(stepNav);
+function decorateButton(button,label){button.replaceChildren(node('span',label),node('span','↗','button-arrow'));button.lastChild.setAttribute('aria-hidden','true');}
+decorateButton($('#next'),'Weiter');decorateButton($('#submit'),preview?'Vorschau prüfen':'Angaben senden');
 go(0);
-if(preview){$('#preview').hidden=false;form.hidden=false;}else if(token){try{const r=await fetch('/api/intake/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})});if(!r.ok)throw Error();form.hidden=false;}catch{$('#blocked').hidden=false;}}else{$('#blocked').hidden=false;}
+if(preview){form.hidden=false;}else if(token){try{const r=await fetch('/api/intake/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})});if(!r.ok)throw Error();form.hidden=false;}catch{$('#blocked').hidden=false;}}else{$('#blocked').hidden=false;}
 // Keep the invitation fragment intact when opening the privacy explanation.
 document.querySelector('a[href="#privacy"]').addEventListener('click',event=>{event.preventDefault();document.querySelector('#privacy details').open=true;document.querySelector('#privacy').scrollIntoView({behavior:'smooth'});});
