@@ -1,6 +1,6 @@
-import { callbackSlots } from './callback-slots.js';
+import { callbackSlots } from './callback-slots.js?v=calendar2';
 const dialog = document.querySelector('#callback'), form = document.querySelector('#callback-form');
-const days = document.querySelector('#callback-days'), times = document.querySelector('#callback-times');
+const days = document.querySelector('#callback-date'), times = document.querySelector('#callback-times');
 let schedule = [], pending;
 function options(container, name, values) {
   container.replaceChildren(...values.map((item, i) => {
@@ -9,8 +9,8 @@ function options(container, name, values) {
     text.textContent = item.label; label.append(input, text); return label;
   }));
 }
-function updateTimes() { options(times, 'time', schedule.find(day => day.value === form.elements.day.value).windows); }
-function refresh() { schedule = callbackSlots(); options(days, 'day', schedule); updateTimes(); }
+function updateTimes() { const chosen = schedule.find(day => day.value === days.value); options(times, 'time', chosen?.windows || []); days.setCustomValidity(chosen ? '' : 'Bitte wählen Sie einen kommenden Werktag innerhalb von 60 Tagen.'); document.querySelector('#callback-error').textContent = chosen ? '' : 'Für diesen Tag gibt es keine Rückrufzeiten. Bitte wählen Sie einen Werktag.'; }
+function refresh() { schedule = callbackSlots(); days.min = schedule[0].value; days.max = schedule.at(-1).value; if(!schedule.some(day => day.value === days.value)) days.value = schedule[0].value; updateTimes(); }
 days.addEventListener('change', updateTimes);
 document.querySelectorAll('[data-callback]').forEach(button => button.addEventListener('click', () => {
   document.querySelector('#callback-content').hidden = false; document.querySelector('#callback-success').hidden = true;

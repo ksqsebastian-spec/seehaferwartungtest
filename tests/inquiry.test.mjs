@@ -21,9 +21,12 @@ import { callbackSlots } from '../public/callback-slots.js';
 test('callback slots skip weekends, use Berlin time and exclude started windows',()=>{
   const slots=callbackSlots(new Date('2026-10-02T14:30:00Z'));
   assert.equal(slots[0].value,'2026-10-05');
-  assert.equal(slots.length,5);
-  assert.deepEqual(callbackSlots(new Date('2026-09-29T08:30:00Z'))[0].windows.map(w=>w.value),['11:00','13:00','15:00']);
+  assert.ok(slots.length >= 40);
+  assert.deepEqual(callbackSlots(new Date('2026-09-29T08:30:00Z'))[0].windows.map(w=>w.value),['11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30']);
 });
 const callback=()=>({kind:'callback',name:'TEST Rückruf',phone:'+49 40 1234567',day:callbackSlots()[0].value,time:callbackSlots()[0].windows[0].value,requestId:payload.requestId});
 test('callback delivers name, phone and requested Berlin window to fixed inbox',async()=>{let sent;const res=await handleInquiry(request(callback()),env,async(_,init)=>{sent=JSON.parse(init.body);return Response.json({id:'callback-id'});});assert.equal(res.status,200);assert.deepEqual(sent.to,['owner@example.com']);assert.ok(sent.text.includes('+49 40 1234567'));assert.ok(sent.text.includes('Europe/Berlin'));assert.ok(sent.subject.startsWith('Rückrufwunsch'));assert.equal(sent.reply_to,undefined);});
 test('callback rejects stale dates, weekends, arbitrary times and invalid phone',async()=>{for(const bad of [{day:'2000-01-01'},{time:'03:00'},{phone:'hello'},{name:''},{phone:'123456\r\nBcc: x'}])assert.equal((await handleInquiry(request({...callback(),...bad}),env,noSend)).status,400);});
+test('callback calendar spans future months with half-hour windows',()=>{const days=callbackSlots(new Date('2026-09-29T08:30:00Z'));assert.ok(days.some(d=>d.value==='2026-11-27'));assert.equal(days.some(d=>d.value==='2026-10-03'),false);assert.equal(days.at(-1).value,'2026-11-27');assert.equal(days[1].windows.length,16);});
+test('callback schedule follows Berlin winter time and one-hour notice',()=>{const days=callbackSlots(new Date('2026-10-26T08:10:00Z'));assert.equal(days[0].windows[0].value,'10:30');});
+test('callback rejects requests outside supported future range',async()=>assert.equal((await handleInquiry(request({...callback(),day:'2099-01-01'}),env,noSend)).status,400));

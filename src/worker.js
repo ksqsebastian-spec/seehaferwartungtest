@@ -33,7 +33,7 @@ export async function handleInquiry(request, env, send = fetch) {
   if (!env.RESEND_API_KEY || !validEmail(env.INQUIRY_TO) || !env.INQUIRY_LIMITER) return response(503, { error: 'Der Versand ist gerade nicht verfügbar. Bitte versuchen Sie es später erneut.' });
   const { success } = await env.INQUIRY_LIMITER.limit({ key: request.headers.get('CF-Connecting-IP') || 'unknown' });
   if (!success) return response(429, { error: 'Bitte warten Sie eine Minute, bevor Sie erneut anfragen.' }, { 'Retry-After': '60' });
-  const address = (data.address || '').trim(), email = (data.email || '').trim(), caretaker = (data.caretaker || '').trim();
+  const address = callback ? '' : data.address.trim(), email = callback ? '' : data.email.trim(), caretaker = callback ? '' : (data.caretaker || '').trim();
   const message = {
     from: 'Seehafer Wartung <onboarding@resend.dev>',
     to: [env.INQUIRY_TO],

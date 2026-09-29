@@ -76,8 +76,10 @@ The frontend retains an idempotency key across retries of unchanged content and 
 
 `npm test` exercises validation, fixed recipients, origin checks, request limits, rate limits, provider failures and idempotent retries. Live end-to-end test on 2026-09-28: browser submission → success state → provider status **delivered**. The test was visibly labeled as a test, not a service order.
 
-### Elements reference update (2026-09-29)
-- Inspected the user's six-item Mobbin Elements collection: https://mobbin.com/collections/23a5924b-4d8b-4eb0-814b-d6e89d9c544c/sites/sections. TinyWins supplies the staggered project collage direction; Ada and Humble inform the selectable process story. Illustrations are original SVG/CSS, not extracted Mobbin artwork.
-- Manufacturer assets 0–4 (GEZE, dormakaba, Würth, Hörmann, Repair Care) are the originals publicly embedded on https://seehafer-elemente.de/, checked 2026-09-29. They indicate published system scope, not customer endorsements or independent certification.
-- Four customer quotes and named attributions come from that same company homepage. No aggregate rating, additional customer identities, or certificate badges were invented. Further projects and certificates need source materials.
-- Process steps support keyboard navigation, explicit pause, reduced motion, and offscreen pause. Mobile view pans the illustration to the chosen step.
+### Scroll library update (2026-09-29)
+- Inspected the user's Mobbin Elements collection: https://mobbin.com/collections/23a5924b-4d8b-4eb0-814b-d6e89d9c544c/sites/sections. TinyWins informed the two-row photographic library; Ada informed the vertical process chapters. Scroll position controls motion; no looping cartoon remains.
+- The library contains three previously sourced projects and nine additional installation photographs publicly embedded at https://seehafer-elemente.de/referenzen, retrieved 2026-09-29. These are twelve views, not a claim of twelve distinct customers. Additional photo captions use source descriptions; no customer names or performance figures were invented.
+- Manufacturer assets (GEZE, dormakaba, Würth, Hörmann, Repair Care) are originals from https://seehafer-elemente.de/. They describe system scope, not endorsements or independent certification. Testimonials and the three credential badges were removed at the user's request.
+- `public/proof-world.css` and `public/proof-world.js` now implement the photographic scroll library and four editorial process chapters. All-view and reduced-motion modes expose the full library as a grid. Detail dialogs are populated by `public/experience.js`.
+- Callback requests use a native calendar, weekdays up to 60 calendar days ahead, half-hour windows from 09:00 to 17:00 Europe/Berlin, and at least one hour's lead time. Shared server/client validation rejects unavailable dates and slots. These are requested times, not automatically confirmed appointments.
+- Validation: 17 API/scheduling tests passed, Worker dry-run succeeded, desktop/mobile library and detail dialog checks passed, 390px mobile layout has no page overflow. Base tag remains unchanged.
