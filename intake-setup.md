@@ -28,3 +28,11 @@ Stündliche GPT-Verarbeitung, Drive-Ablage, Google Calendar, Angebotserstellung 
 
 ## Prüfung
 26 automatisierte Tests bestanden: vorhandene Anfrage/Rückruf-Funktionen sowie Einladungssignatur, Ablauf, Eingaben, Termine, Anhänge, fester Empfänger, Idempotenz und Versandfehler. Formular in Browser-Vorschau vollständig bis zum Abschluss ausgefüllt; dabei kein Versand. Live-API prüft gültige und ungültige Einladung ohne Mailversand.
+
+## Überarbeitung: Interaktion und Mailvorschau
+- Direkte Mailvorschau ohne Resend-Login: https://seehaferwartungtest.ksqsebastian.workers.dev/mail-vorschau
+- Der Aufnahmebutton in dieser Vorschau führt zu `/aufnahme?preview=1` und erlaubt keinen Versand.
+- Resend-Variable `INTAKE_URL` hat dieselbe Vorschau als Fallback. Für echte Kundenmails muss der Versand weiterhin einen signierten persönlichen Link explizit setzen; der Fallback ersetzt keine Einladung.
+- Anrufen, E-Mail und WhatsApp sind große, getrennte E-Mail-kompatible Tabellenbuttons.
+- Formular: Auswahlkarten, besuchte Schritte direkt erreichbar, zusätzliche Details einklappbar, kompakte Zusammenfassung und reduzierte Animation bei entsprechender Systemeinstellung.
+- Vollständiger Vorschauablauf und Mailbutton im Browser geprüft; mobile Mail bei 390px ohne horizontalen Überlauf; 26 Tests weiterhin bestanden.
