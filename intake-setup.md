@@ -36,3 +36,10 @@ Stündliche GPT-Verarbeitung, Drive-Ablage, Google Calendar, Angebotserstellung 
 - Anrufen, E-Mail und WhatsApp sind große, getrennte E-Mail-kompatible Tabellenbuttons.
 - Formular: Auswahlkarten, besuchte Schritte direkt erreichbar, zusätzliche Details einklappbar, kompakte Zusammenfassung und reduzierte Animation bei entsprechender Systemeinstellung.
 - Vollständiger Vorschauablauf und Mailbutton im Browser geprüft; mobile Mail bei 390px ohne horizontalen Überlauf; 26 Tests weiterhin bestanden.
+
+## Geführter Ablauf nach Mobbin-Referenz
+Objekt und Kontakt sind nun getrennte Schritte; insgesamt sechs Themen plus Prüfung. Zentraler Inhalt statt Seitenleiste, Auswahlkarten mit SVG-Symbolen, segmentierter Fortschritt und sticky Weiter-Leiste. Unbekannt-Auswahl schließt widersprüchliche konkrete Checkboxen aus.
+Designreferenzen (Airbnb auf Mobbin, visuell geprüft):
+- https://mobbin.com/screens/4d35ef38-4248-4ba8-8b4c-e565e6b755da
+- https://mobbin.com/screens/f99f5466-e3f5-4ade-a5d6-8d1f840f6e23
+Keine Referenzbilder oder Markenassets übernommen. Vollständiger Browser-Vorschauablauf bis Abschluss bestanden; Live-Seite bei 390px ohne horizontalen Überlauf; Backendtests weiterhin 26/26 bestanden.
