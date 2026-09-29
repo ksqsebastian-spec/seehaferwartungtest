@@ -75,3 +75,9 @@ Configure `RESEND_API_KEY` (sending-only) and `INQUIRY_TO` with `wrangler secret
 The frontend retains an idempotency key across retries of unchanged content and preserves form fields after errors. It clears the form only after a confirmed provider response. No automatic confirmation email is sent to the visitor. Request contents are not written to application logs or a site database; Resend and the recipient mailbox process/store the email.
 
 `npm test` exercises validation, fixed recipients, origin checks, request limits, rate limits, provider failures and idempotent retries. Live end-to-end test on 2026-09-28: browser submission → success state → provider status **delivered**. The test was visibly labeled as a test, not a service order.
+
+### Elements reference update (2026-09-29)
+- Inspected the user's six-item Mobbin Elements collection: https://mobbin.com/collections/23a5924b-4d8b-4eb0-814b-d6e89d9c544c/sites/sections. TinyWins supplies the staggered project collage direction; Ada and Humble inform the selectable process story. Illustrations are original SVG/CSS, not extracted Mobbin artwork.
+- Manufacturer assets 0–4 (GEZE, dormakaba, Würth, Hörmann, Repair Care) are the originals publicly embedded on https://seehafer-elemente.de/, checked 2026-09-29. They indicate published system scope, not customer endorsements or independent certification.
+- Four customer quotes and named attributions come from that same company homepage. No aggregate rating, additional customer identities, or certificate badges were invented. Further projects and certificates need source materials.
+- Process steps support keyboard navigation, explicit pause, reduced motion, and offscreen pause. Mobile view pans the illustration to the chosen step.

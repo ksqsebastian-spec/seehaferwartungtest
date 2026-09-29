@@ -2,8 +2,7 @@ const $=s=>document.querySelector(s);const reduced=matchMedia('(prefers-reduced-
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 function progress(el){const r=el.getBoundingClientRect();return clamp(-r.top/(r.height-innerHeight))}
 function animate(){document.body.classList.toggle('scrolled',scrollY>100);document.body.classList.toggle('past-hero',scrollY>innerHeight*.85);if(!motion)return;
-const p=progress($('.feature-scroll'))*2.5;document.querySelectorAll('.feature-caption').forEach((el,i)=>el.classList.toggle('active',i===Math.min(2,Math.floor(p+.15))));
-[1,2,3].forEach((n,i)=>{const exit=i===2?0:clamp((p-i-.25)/.75),enter=clamp(p-i+1);const y=(1-enter)*22*(i?1:0)-exit*innerHeight*.95;const scale=i?(.94+.06*enter):1;const el=$('.panel-'+n);el.style.transform=`translateY(${y}px) scale(${scale})`;el.style.opacity=String(1-clamp((exit-.8)*5));el.style.pointerEvents=exit>.8?'none':'auto'});
+
 
 
 }
